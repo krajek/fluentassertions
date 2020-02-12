@@ -3533,6 +3533,77 @@ namespace FluentAssertions.Specs
         }
 
         [Fact]
+        public void When_throwing_on_missing_members_excluding_fields_and_there_is_a_missing_property_should_throw()
+        {
+            // Arrange
+            var subject = new
+            {
+                Version = 2,
+                //Age = 36, //age is missing
+            };
+
+            var expectation = new
+            {
+                Version = 2,
+                Age = 36
+            };
+
+            // Act
+            Action act = () => subject.Should().BeEquivalentTo(expectation,
+                options => options.ThrowingOnMissingMembers().ExcludingFields());
+
+            // Assert
+            act.Should().Throw<XunitException>()
+                .WithMessage("Expectation has member Age that the other object does not have*");
+        }
+
+        [Fact]
+        public void When_throwing_on_missing_members_but_ignoring_properties_and_there_is_a_missing_property_should_not_throw()
+        {
+            // Arrange
+            var subject = new ClassWithAllAccessModifiersForMembers()
+            {
+                PublicField = "VALUE"
+            };
+
+            var expectation = new ClassWithAllAccessModifiersForMembers()
+            {
+                PublicProperty = "ABC", // missing property but properties are ignored
+                PublicField = "VALUE"
+            };
+
+            // Act
+            Action act = () => subject.Should().BeEquivalentTo(expectation,
+                options => options.ThrowingOnMissingMembers().ExcludingProperties());
+
+            // Assert
+            act.Should().NotThrow();
+        }
+
+        [Fact]
+        public void When_throwing_on_missing_members_but_ignoring_fields_and_there_is_a_missing_field_should_not_throw()
+        {
+            // Arrange
+            var subject = new ClassWithAllAccessModifiersForMembers()
+            {
+                PublicProperty = "VALUE"
+            };
+
+            var expectation = new ClassWithAllAccessModifiersForMembers()
+            {
+                PublicField = "ABC", // missing field but fields are ignored
+                PublicProperty = "VALUE"
+            };
+
+            // Act
+            Action act = () => subject.Should().BeEquivalentTo(expectation,
+                options => options.ThrowingOnMissingMembers().ExcludingFields());
+
+            // Assert
+            act.Should().NotThrow();
+        }
+
+        [Fact]
         public void When_throwing_on_missing_members_and_there_is_an_additional_property_on_subject_should_not_throw()
         {
             // Arrange
@@ -3985,6 +4056,11 @@ namespace FluentAssertions.Specs
         private string PrivateProperty { get; set; }
 
         private protected string PrivateProtectedProperty { get; set; }
+
+        public ClassWithAllAccessModifiersForMembers()
+        {
+            
+        }
 
         public ClassWithAllAccessModifiersForMembers(string publicValue, string protectedValue, string internalValue,
             string protectedInternalValue, string privateValue, string privateProtectedValue)
