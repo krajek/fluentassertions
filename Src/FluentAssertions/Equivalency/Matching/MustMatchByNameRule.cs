@@ -11,26 +11,26 @@ namespace FluentAssertions.Equivalency.Matching
     {
         public SelectedMemberInfo Match(SelectedMemberInfo expectedMember, object subject, string memberPath, IEquivalencyAssertionOptions config)
         {
-            SelectedMemberInfo compareeSelectedMemberInfoInfo = null;
+            SelectedMemberInfo compareeSelectedMemberInfo = null;
 
             if (config.IncludeProperties)
             {
-                compareeSelectedMemberInfoInfo = SelectedMemberInfo.Create(subject.GetType()
+                compareeSelectedMemberInfo = SelectedMemberInfo.Create(subject.GetType()
                     .FindProperty(expectedMember.Name, expectedMember.MemberType));
             }
 
-            if ((compareeSelectedMemberInfoInfo is null) && config.IncludeFields)
+            if ((compareeSelectedMemberInfo is null) && config.IncludeFields)
             {
-                compareeSelectedMemberInfoInfo = SelectedMemberInfo.Create(subject.GetType()
+                compareeSelectedMemberInfo = SelectedMemberInfo.Create(subject.GetType()
                     .FindField(expectedMember.Name, expectedMember.MemberType));
             }
 
-            if ((compareeSelectedMemberInfoInfo is null || !config.UseRuntimeTyping) && ExpectationImplementsMemberExplicitly(subject, expectedMember))
+            if ((compareeSelectedMemberInfo is null || !config.UseRuntimeTyping) && ExpectationImplementsMemberExplicitly(subject, expectedMember))
             {
-                compareeSelectedMemberInfoInfo = expectedMember;
+                compareeSelectedMemberInfo = expectedMember;
             }
 
-            if (compareeSelectedMemberInfoInfo is null)
+            if (compareeSelectedMemberInfo is null)
             {
                 string path = (memberPath.Length > 0) ? memberPath + "." : "member ";
 
@@ -38,7 +38,7 @@ namespace FluentAssertions.Equivalency.Matching
                     "Expectation has " + path + expectedMember.Name + " that the other object does not have.");
             }
 
-            return compareeSelectedMemberInfoInfo;
+            return compareeSelectedMemberInfo;
         }
 
         private static bool ExpectationImplementsMemberExplicitly(object expectation, SelectedMemberInfo subjectMember)
